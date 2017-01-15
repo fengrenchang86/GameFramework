@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Testing websockets V3</title>
+</head>
+<body>
+	<div>
+		<textarea id="voice" rows="20" cols="100"></textarea>
+		<input type="submit" value="Start" onclick="start()" />
+	</div>
+	<div id="messages"></div>
+	<script type="text/javascript">
+//		var webSocket = new WebSocket('ws://192.168.1.123:8080/websocket/chat');
+		var webSocket = new WebSocket('ws://localhost:8080/websocket/room?tokenId=123&roomId=322');
+
+		webSocket.onerror = function(event) {
+			onError(event)
+		};
+
+		webSocket.onopen = function(event) {
+			onOpen(event)
+		};
+
+		webSocket.onmessage = function(event) {
+			onMessage(event)
+		};
+
+		function onMessage(event) {
+			document.getElementById('messages').innerHTML += '<br />'
+					+ event.data;
+		}
+
+		function onOpen(event) {
+			document.getElementById('messages').innerHTML = 'Connection established';
+		}
+
+		function onError(event) {
+			alert(event.data);
+		}
+
+		function start() {
+			var dt = document.getElementById("voice").value;
+			webSocket.send(dt);
+			document.getElementById("voice").value = "";
+			return false;
+		}
+	</script>
+</body>
+</html>

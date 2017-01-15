@@ -14,7 +14,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.frc.games.framework.websocket;
+package com.frc.games.guessnumber.websocket;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -24,6 +24,7 @@ import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import javax.annotation.Resource;
 import javax.websocket.OnClose;
 import javax.websocket.OnError;
 import javax.websocket.OnMessage;
@@ -31,10 +32,19 @@ import javax.websocket.OnOpen;
 import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 
+import org.springframework.stereotype.Service;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
+
+import com.frc.common.listener.InitServer;
+import com.frc.games.framework.service.IRoomService;
+import com.frc.games.guessnumber.service.impl.GuessNumberRoomService;
+
+import antlr.debug.GuessingEvent;
+
+
 @ServerEndpoint(value = "/websocket/room")
 public class ChatAnnotation {
-
-  
     private static final String GUEST_PREFIX = "Guest";
     private static final AtomicInteger connectionIds = new AtomicInteger(0);
     private static final Set<ChatAnnotation> connections =
@@ -42,9 +52,13 @@ public class ChatAnnotation {
 
     private final String nickname;
     private Session session;
+    
+    @Resource(name="GuessNumberRoomService")
+	protected IRoomService roomService;
 
     public ChatAnnotation() {
         nickname = GUEST_PREFIX + connectionIds.getAndIncrement();
+        
     }
 
 
@@ -52,10 +66,25 @@ public class ChatAnnotation {
     public void start(Session session) {
         this.session = session;
         
+        if (roomService == null) {
+        	roomService = (IRoomService) InitServer.getApplicationContext().getBean("GuessNumberRoomService");
+//        	String[] names = InitServer.getApplicationContext().getBeanDefinitionNames();
+//        	System.out.println(names.length);
+        }
+        
+        System.out.println("Someone come in : " + Thread.currentThread().getId());
+        try {
+        	Thread.sleep(3*1000);
+        } catch (InterruptedException e) {}
+        
         String queyrString = session.getQueryString();
         Map<String, String> query = parseQuerySring(queyrString);
+        System.out.println(query);
+        
         String tokenId = query.get("tokenId");
-        if (tokenId == null || tokenId.trim().length() == 0) {
+        String roomId = query.get("roomId");
+        boolean verifyResult = roomService.inRoom(tokenId, roomId);
+        if (!verifyResult) {
         	try {
 				session.close();
 			} catch (IOException e) {
@@ -84,6 +113,7 @@ public class ChatAnnotation {
 
     @OnMessage
     public void incoming(String message) {
+    	System.out.println("Someone say something : " + Thread.currentThread().getId());
         // Never trust the client
 //        String filteredMessage = String.format("%s: %s", nickname, HTMLFilter.filter(message.toString()));
     	String filteredMessage = String.format("%s: %s", nickname, message);

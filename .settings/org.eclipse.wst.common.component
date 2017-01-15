@@ -2,5 +2,7 @@
     <wb-module deploy-name="GameFramework">
         <wb-resource deploy-path="/" source-path="/src"/>
         <wb-resource deploy-path="/" source-path="/test"/>
+        <wb-resource deploy-path="/" source-path="/resource"/>
+        <wb-resource deploy-path="/" source-path="/webapp"/>
     </wb-module>
 </project-modules>
