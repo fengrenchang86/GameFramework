@@ -20,11 +20,14 @@ public class TokenController {
 	@RequestMapping(value = "/create")
 	public @ResponseBody String create(HttpServletRequest request) {
 		String ip = request.getRemoteAddr();
+		System.out.println(request.getRemoteHost() + "," + request.getRemoteUser() + "," + 
+		request.getRemotePort());
 		UserProperties userProp = new UserProperties();
 		userProp.setIpAddress(ip);
 		
 		String token = tokenService.generateToken(userProp);
 		
+		System.out.println("TokenId:" + token);
 		return token;
 	}
 

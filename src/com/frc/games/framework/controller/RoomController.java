@@ -43,6 +43,12 @@ public class RoomController {
 		
 		String tokenId = request.getUserTokenId();
 		UserProperties userProp = tokenService.queryUser(tokenId);
+		
+		if (userProp == null) {
+			response.setCode("1");
+			response.setMsg("User invalid");
+			return response;
+		}
 		Player player = new Player(userProp.getName(), ip, tokenId);
 		
 		int size = 2;
@@ -81,13 +87,18 @@ public class RoomController {
 	@RequestMapping(value = "/join")
 	public @ResponseBody JoinRoomResponse verify(
 			HttpServletRequest httpReq, 
-			JoinRoomRequest request)
+			@RequestBody JoinRoomRequest request)
 			throws Exception {
 		JoinRoomResponse response = new JoinRoomResponse();
 		
 		String ip = httpReq.getRemoteAddr();
 		String tokenId = request.getTokenId();
 		UserProperties userProp = tokenService.queryUser(tokenId);
+		if (userProp == null) {
+			response.setCode("1");
+			response.setMsg("User invalid");
+			return response;
+		}
 		Player player = new Player(userProp.getName(), ip, tokenId);
 		
 		boolean result = roomService.joinRoom(player, request.getRoomId());

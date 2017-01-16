@@ -59,8 +59,9 @@ public class GuessNumberTokenService implements ITokenService {
 	protected void removeUser(UserProperties userProp) {
 		for (Entry<String, UserProperties> entry : userMap.entrySet()) {
 			UserProperties up = entry.getValue();
-			if (up.getIpAddress().equals(userProp.getIpAddress()) && 
-				up.getName().equals(userProp.getName())) {
+			if (up != null && up.getIpAddress().equals(userProp.getIpAddress()) && 
+				up.getName().equals(userProp.getName()) &&
+				up.getTokenId().equals(userProp.getTokenId())) {
 				userMap.put(entry.getKey(), null);
 			}	
 		}

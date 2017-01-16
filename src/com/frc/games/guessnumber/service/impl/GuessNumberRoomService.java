@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import com.frc.games.framework.common.GameStatus;
+import com.frc.games.framework.model.Game;
 import com.frc.games.framework.model.Player;
 import com.frc.games.framework.model.Room;
 import com.frc.games.framework.service.IRoomService;
@@ -26,6 +27,10 @@ public class GuessNumberRoomService implements IRoomService {
 		room.addPlayer(player);
 		room.setRoomId(UUID.randomUUID().toString());
 		
+		Game game = new Game();
+		game.setId(UUID.randomUUID().toString());
+		room.setGame(game);
+		
 		roomMap.put(room.getRoomId(), room);
 		return room;
 	}
@@ -36,7 +41,7 @@ public class GuessNumberRoomService implements IRoomService {
 	
 	public boolean joinRoom(Player player, String roomId) {
 		Room room = findRoom(roomId);
-		if (canJoin(room)) {
+		if (canJoin(room) && !inRoom(player.getToken(), roomId)) {
 			room.addPlayer(player);
 			return true;
 		} else {

@@ -4,6 +4,11 @@ public class UserProperties {
 	protected String name;
 	protected String tokenId;
 	protected String ipAddress;
+	public UserProperties() {
+		name = "";
+		tokenId = "";
+		ipAddress = "";
+	}
 	public String getName() {
 		return name;
 	}
